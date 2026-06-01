@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Três S — Sobremesas</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+  :root {
+    --rosa: #d15674;
+    --rosa-claro: #f29db4;
+    --rosa-bg: #fce8ed;
+    --creme: #fff8f0;
+    --ouro: #c9a96e;
+    --texto: #4a2030;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background-color: var(--creme);
+    font-family: 'Jost', sans-serif;
+    color: var(--texto);
+    min-height: 100vh;
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(160deg, #fff0f5 0%, #fce8ed 60%, #f7d2db 100%);
+    text-align: center;
+    padding: 50px 20px 35px;
+    border-bottom: 3px dashed var(--rosa-claro);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before, .hero::after {
+    content: '♥';
+    position: absolute; top: 12px; color: var(--rosa-claro); font-size: 22px; opacity: 0.5;
+  }
+  .hero::before { left: 20px; }
+  .hero::after { right: 20px; }
+  
+  .hero-nome {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(54px, 12vw, 90px);
+    color: var(--rosa);
+    line-height: 1;
+    letter-spacing: 2px;
+  }
+  .hero-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--rosa-claro);
+    font-size: 18px;
+    letter-spacing: 3px;
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+  .hero-desc { font-size: 13px; color: #a06070; margin-top: 14px; letter-spacing: 1px; }
+
+  /* FORMULÁRIO DE CADASTRO / DADOS */
+  .dados-section {
+    background: white;
+    border-bottom: 1px solid #f0dde3;
+    padding: 20px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .dados-titulo {
+    font-size: 13px; font-weight: 700; color: var(--rosa); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px;
+  }
+  .dados-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .dados-campo { display: flex; flex-direction: column; gap: 5px; }
+  .dados-campo-full { grid-column: 1 / -1; }
+  .dados-campo label { font-size: 12px; font-weight: 600; color: #a06070; }
+  .dados-campo input {
+    border: 2px solid var(--rosa-claro); border-radius: 10px; padding: 10px 14px;
+    font-size: 14px; font-family: 'Jost', sans-serif; color: var(--texto); outline: none;
+    background: var(--rosa-bg); transition: border-color 0.2s;
+  }
+  .dados-campo input:focus { border-color: var(--rosa); }
+
+  .pgto-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 4px; }
+  .btn-pgto {
+    background: var(--rosa-bg); border: 2px solid var(--rosa-claro); color: var(--rosa);
+    padding: 10px 4px; border-radius: 10px; font-size: 13px; font-weight: 600; font-family: 'Jost', sans-serif;
+    cursor: pointer; transition: all 0.15s; text-align: center;
+  }
+  .btn-pgto:hover { border-color: var(--rosa); background: #f7d2db; }
+  .btn-pgto.ativo { background: var(--rosa); color: white; border-color: var(--rosa); }
+
+  /* CARDÁPIO */
+  .cardapio { max-width: 680px; margin: 0 auto; padding: 24px 16px 180px; }
+  .secao-titulo {
+    font-family: 'Cormorant Garamond', serif; font-size: 13px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--rosa); text-align: center; margin: 28px 0 18px; display: flex; align-items: center; gap: 12px;
+  }
+  .secao-titulo::before, .secao-titulo::after { content: ''; flex: 1; height: 1px; background: var(--rosa-claro); }
+
+  .produto-card {
+    background: white; border: 1px solid #f0dde3; border-radius: 16px; margin-bottom: 12px;
+    display: flex; align-items: center; padding: 16px 18px; gap: 14px;
+    box-shadow: 0 2px 12px rgba(209,86,116,0.06); position: relative; overflow: hidden;
+  }
+  .produto-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--rosa-claro); opacity: 0;
+  }
+  .produto-card.selecionado { border-color: var(--rosa); }
+  .produto-card.selecionado::before { opacity: 1; }
+  .produto-emoji { font-size: 34px; min-width: 42px; text-align: center; }
+  .produto-info { flex: 1; }
+  .produto-nome { font-weight: 600; font-size: 15px; color: var(--texto); }
+  .produto-preco { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--rosa); font-weight: 600; margin-top: 3px; }
+  .produto-estoque { font-size: 11px; color: #b08090; margin-top: 2px; }
+
+  .controle-qtd { display: flex; align-items: center; gap: 10px; }
+  .btn-qtd {
+    width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--rosa-claro);
+    background: white; color: var(--rosa); font-size: 18px; font-weight: bold; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-qtd:hover { background: var(--rosa); color: white; border-color: var(--rosa); }
+  .qtd-num { font-size: 17px; font-weight: 700; min-width: 22px; text-align: center; }
+
+  /* CARRINHO FLUTUANTE */
+  .carrinho-fixo {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 680px;
+    background: white; border-top: 3px solid var(--rosa-claro); box-shadow: 0 -6px 30px rgba(209,86,116,0.18); z-index: 100;
+  }
+  .carrinho-resumo { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; gap: 12px; }
+  .carrinho-info { display: flex; flex-direction: column; }
+  .carrinho-qtd { font-size: 12px; color: #a06070; text-transform: uppercase; letter-spacing: 1px; }
+  .carrinho-total { font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--rosa); font-weight: 700; }
+  
+  .carrinho-botoes { display: flex; gap: 8px; }
+  .btn-acao {
+    color: white; border: none; padding: 14px 20px; border-radius: 30px;
+    font-size: 14px; font-weight: 700; font-family: 'Jost', sans-serif; letter-spacing: 0.5px;
+    cursor: pointer; text-transform: uppercase; transition: background 0.2s; white-space: nowrap;
+  }
+  .btn-pedido { background: var(--rosa); }
+  .btn-pedido:hover { background: #b8405e; }
+  .btn-export { background: var(--ouro); }
+  .btn-export:hover { background: #b5955c; }
+  .btn-acao:disabled { background: #ddd; color: #aaa; cursor: not-allowed; }
+
+  .carrinho-detalhe { display: none; padding: 0 20px 16px; border-top: 1px solid var(--rosa-bg); }
+  .carrinho-detalhe.aberto { display: block; }
+  .carrinho-item-linha { display: flex; justify-content: space-between; font-size: 14px; color: #7a4050; padding: 6px 0; border-bottom: 1px dashed #f0dde3; }
+  
+  .btn-ver-carrinho { background: none; border: none; color: var(--rosa); font-size: 12px; cursor: pointer; text-decoration: underline; padding: 0; margin-top: 2px; text-align: left;}
+
+  .obs-input {
+    background: var(--rosa-bg); border: 1px solid var(--rosa-claro); border-radius: 10px;
+    padding: 10px; font-size: 14px; width: 100%; resize: none; outline: none; margin-top: 8px; font-family: 'Jost', sans-serif;
+  }
+  .obs-label { font-size: 11px; color: var(--rosa); font-weight: 600; text-transform: uppercase; margin-top: 12px; display: block; }
+
+  /* MODAL */
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; justify-content: center; align-items: center; }
+  .overlay.ativo { display: flex; }
+  .modal-sucesso {
+    background: white; border-radius: 24px; padding: 35px 25px; text-align: center; max-width: 340px; width: 90%;
+    border: 3px solid var(--rosa-claro); animation: popUp 0.3s ease;
+  }
+  @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .modal-sucesso h2 { font-family: 'Great Vibes', cursive; font-size: 38px; color: var(--rosa); margin-bottom: 8px; }
+  .num-pedido { background: var(--rosa-bg); border: 2px dashed var(--rosa-claro); border-radius: 12px; padding: 8px; margin: 12px 0; font-size: 20px; font-weight: 700; color: var(--rosa); }
+  .btn-ok { background: var(--rosa); color: white; border: none; padding: 10px 30px; border-radius: 30px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+
+  /* ESTILIZAÇÃO DO COMPROVANTE EXPORTADO (ALVO DO PDF) */
+  .print-pdf { padding: 30px; background: #fff8f0; font-family: 'Jost', sans-serif; color: #4a2030; }
+  .print-header { text-align: center; border-bottom: 2px dashed #d15674; padding-bottom: 15px; margin-bottom: 20px; }
+  .print-section { background: white; padding: 15px; border-radius: 10px; border: 1px solid #f0dde3; margin-bottom: 15px; }
+  .print-section h3 { font-size: 13px; color: #d15674; text-transform: uppercase; margin-bottom: 8px; border-bottom: 1px solid #fce8ed; padding-bottom: 4px; }
+  .print-section p { font-size: 14px; margin-bottom: 5px; }
+
+  @media (max-width: 480px) {
+    .dados-grid { grid-template-columns: 1fr; }
+    .pgto-grid { grid-template-columns: repeat(2, 1fr); }
+    .carrinho-resumo { flex-direction: column; align-items: stretch; }
+    .carrinho-botoes { grid-template-columns: 1fr 1fr; display: grid; }
+  }
+</style>
+</head>
+<body>
+
+  <form id="meuFormulario" onsubmit="enviarPedido(event)">
+    <div class="hero">
+      <div class="hero-nome">Três S</div>
+      <div class="hero-sub">Sobremesas</div>
+      <div class="hero-desc">♥ Feito com amor, entregue com carinho ♥</div>
+    </div>
+
+    <div class="dados-section">
+      <div class="dados-titulo">📋 Informações do Solicitante</div>
+      <div class="dados-grid">
+        <div class="dados-campo">
+          <label>Nome Completo *</label>
+          <input type="text" id="nome" placeholder="Digite seu nome" required>
+        </div>
+        <div class="dados-campo">
+          <label>Telefone / WhatsApp *</label>
+          <input type="tel" id="telefone" placeholder="(00) 00000-0000" required>
+        </div>
+        <div class="dados-campo dados-campo-full">
+          <label>Endereço de Entrega *</label>
+          <input type="text" id="endereco" placeholder="Rua, número, bairro, complemento..." required>
+        </div>
+        <div class="dados-campo dados-campo-full">
+          <label>Forma de Pagamento *</label>
+          <input type="text" id="pgto-validador" style="opacity:0; height:1px; position:absolute; pointer-events:none;" required>
+          <div class="pgto-grid">
+            <button type="button" class="btn-pgto" onclick="selecionarPgto('Dinheiro', this)">💵 Dinheiro</button>
+            <button type="button" class="btn-pgto" onclick="selecionarPgto('Pix', this)">📲 Pix</button>
+            <button type="button" class="btn-pgto" onclick="selecionarPgto('Débito', this)">💳 Débito</button>
+            <button type="button" class="btn-pgto" onclick="selecionarPgto('Crédito', this)">💳 Crédito</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cardapio">
+      <div class="secao-titulo">✦ Nossos Doces ✦</div>
+      <div id="lista-produtos"></div>
+    </div>
+
+    <div class="carrinho-fixo">
+      <div class="carrinho-detalhe" id="carrinho-detalhe">
+        <div id="itens-detalhe"></div>
+        <span class="obs-label">Observações adicionais:</span>
+        <textarea class="obs-input" id="obs-pedido" rows="2" placeholder="Ex: Sem açúcar, ponto do doce, embalagem para presente..."></textarea>
+      </div>
+      <div class="carrinho-resumo">
+        <div class="carrinho-info">
+          <span class="carrinho-qtd" id="txt-qtd">Carrinho vazio</span>
+          <span class="carrinho-total" id="txt-total">R$ 0,00</span>
+          <button type="button" class="btn-ver-carrinho" id="btn-ver" onclick="toggleCarrinho()">▲ ver itens</button>
+        </div>
+        <div class="carrinho-botoes">
+          <button type="button" class="btn-acao btn-export" id="btn-export" onclick="exportarPDF()" disabled>Exportar PDF 📄</button>
+          <button type="submit" class="btn-acao btn-pedido" id="btn-enviar" disabled>Enviar Pedido ♥</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="overlay" id="overlay-ok">
+    <div class="modal-sucesso">
+      <h2>Pedido Recebido!</h2>
+      <p>Sua solicitação foi registrada com sucesso.</p>
+      <div class="num-pedido" id="txt-num-pedido">#0000</div>
+      <p>Obrigada pela preferência! ♥</p>
+      <button class="btn-ok" onclick="fecharModal()">Ok</button>
+    </div>
+  </div>
+
+<script>
+  const produtos = {
+    "106": { nome: "Bolo no Pote Ninho", preco: 20.00, estoque: 20, qtd: 0 },
+    "107": { nome: "Bolo no Pote Brigadeiro", preco: 20.00, estoque: 20, qtd: 0 }
+  };
+  
+  let formaPagamento = "";
+
+  function renderizarCardapio() {
+    const container = document.getElementById('lista-produtos');
+    container.innerHTML = "";
+    Object.keys(produtos).forEach(id => {
+      const p = produtos[id];
+      container.innerHTML += `
+        <div class="produto-card" id="card-${id}">
+          <div class="produto-emoji">🧁</div>
+          <div class="produto-info">
+            <div class="produto-nome">${p.nome}</div>
+            <div class="produto-preco">R$ ${p.preco.toFixed(2).replace('.',',')}</div>
+            <div class="produto-estoque">Disponível: ${p.estoque}</div>
+          </div>
+          <div class="controle-qtd">
+            <button type="button" class="btn-qtd" onclick="alterarQtd('${id}', -1)">-</button>
+            <span class="qtd-num" id="qtd-${id}">0</span>
+            <button type="button" class="btn-qtd" onclick="alterarQtd('${id}', 1)">+</button>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  function alterarQtd(id, valor) {
+    const p = produtos[id];
+    let novaQtd = p.qtd + valor;
+    if(novaQtd >= 0 && novaQtd <= p.estoque) {
+      p.qtd = novaQtd;
+      document.getElementById(`qtd-${id}`).innerText = novaQtd;
+      const card = document.getElementById(`card-${id}`);
+      if(novaQtd > 0) card.classList.add('selecionado');
+      else card.classList.remove('selecionado');
+      atualizarCarrinho();
+    }
+  }
+
+  function atualizarCarrinho() {
+    let totalItens = 0;
+    let valorTotal = 0;
+    let htmlDetalhe = "";
+
+    Object.keys(produtos).forEach(id => {
+      const p = produtos[id];
+      if(p.qtd > 0) {
+        totalItens += p.qtd;
+        valorTotal += (p.qtd * p.preco);
+        htmlDetalhe += `
+          <div class="carrinho-item-linha">
+            <span>${p.qtd}x ${p.nome}</span>
+            <span>R$ ${(p.qtd * p.preco).toFixed(2).replace('.',',')}</span>
+          </div>
+        `;
+      }
+    });
+
+    document.getElementById('itens-detalhe').innerHTML = htmlDetalhe;
+    document.getElementById('txt-total').innerText = `R$ ${valorTotal.toFixed(2).replace('.',',')}`;
+    
+    const temItens = totalItens > 0;
+    document.getElementById('txt-qtd').innerText = temItens ? `${totalItens} ${totalItens > 1 ? 'itens' : 'item'}` : "Carrinho vazio";
+    document.getElementById('btn-enviar').disabled = !temItens;
+    document.getElementById('btn-export').disabled = !temItens;
+  }
+
+  function selecionarPgto(forma, btn) {
+    document.querySelectorAll('.btn-pgto').forEach(b => b.classList.remove('ativo'));
+    btn.classList.add('ativo');
+    formaPagamento = forma;
+    document.getElementById('pgto-validador').value = forma;
+  }
+
+  function toggleCarrinho() {
+    document.getElementById('carrinho-detalhe').classList.toggle('aberto');
+  }
+
+  // ===== FUNÇÃO PARA FAZER O EXPORT EM PDF =====
+  function exportarPDF() {
+    // Valida se os campos obrigatórios do formulário foram preenchidos antes de exportar
+    const form = document.getElementById('meuFormulario');
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const nome = document.getElementById('nome').value;
+    const telefone = document.getElementById('telefone').value;
+    const endereco = document.getElementById('endereco').value;
+    const obs = document.getElementById('obs-pedido').value || "Nenhuma observação.";
+    const numPedido = Math.floor(1000 + Math.random() * 9000);
+
+    // Monta a listagem dos doces comprados para inserir no documento
+    let itensHTML = "";
+    let totalGeral = 0;
+    Object.keys(produtos).forEach(id => {
+      const p = produtos[id];
+      if(p.qtd > 0) {
+        totalGeral += (p.qtd * p.preco);
+        itensHTML += `
+          <div class="carrinho-item-linha" style="padding: 6px 0; border-bottom: 1px dashed #f0dde3;">
+            <span>${p.qtd}x — ${p.nome}</span>
+            <strong>R$ ${(p.qtd * p.preco).toFixed(2).replace('.',',')}</strong>
+          </div>`;
+      }
+    });
+
+    // Cria elemento temporário estruturado para ser a página do PDF
+    const elementoPDF = document.createElement('div');
+    elementoPDF.className = "print-pdf";
+    elementoPDF.innerHTML = `
+      <div class="print-header">
+        <h1 style="font-family: 'Great Vibes', cursive; font-size: 46px; color: #d15674;">Três S</h1>
+        <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 12px; color: #f29db4;">Comprovante de Solicitação</p>
+      </div>
+      
+      <div class="print-section">
+        <h3>📦 Detalhes do Pedido</h3>
+        <p><strong>Pedido Número:</strong> # ${numPedido}</p>
+        <p><strong>Data de Emissão:</strong> ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+        <p><strong>Status:</strong> Aguardando Confirmação</p>
+      </div>
+
+      <div class="print-section">
+        <h3>👤 Dados do Solicitante</h3>
+        <p><strong>Nome:</strong> ${nome}</p>
+        <p><strong>WhatsApp:</strong> ${telefone}</p>
+        <p><strong>Endereço de Entrega:</strong> ${endereco}</p>
+        <p><strong>Forma de Pagamento:</strong> ${formaPagamento}</p>
+      </div>
+
+      <div class="print-section">
+        <h3>🧁 Itens Solicitados</h3>
+        ${itensHTML}
+        <div style="display: flex; justify-content: space-between; font-size: 16px; margin-top: 12px; font-weight: bold; color: #d15674;">
+          <span>VALOR TOTAL:</span>
+          <span>R$ ${totalGeral.toFixed(2).replace('.',',')}</span>
+        </div>
+      </div>
+
+      <div class="print-section">
+        <h3>💬 Observações</h3>
+        <p style="font-style: italic;">"${obs}"</p>
+      </div>
+
+      <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #b08090;">
+        <p>Obrigado por escolher a Três S Sobremesas! ♥</p>
+      </div>
+    `;
+
+    // Configurações do arquivo de exportação
+    const opcoes = {
+      margin:       12,
+      filename:     `Solicitacao_Pedido_${numPedido}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    // Executa o download imediato
+    html2pdf().set(opces).from(elementoPDF).save();
+  }
+
+  function enviarPedido(event) {
+    event.preventDefault();
+    const numPedido = Math.floor(1000 + Math.random() * 9000);
+    document.getElementById('txt-num-pedido').innerText = `#${numPedido}`;
+    document.getElementById('overlay-ok').classList.add('ativo');
+  }
+
+  function fecharModal() {
+    document.getElementById('overlay-ok').classList.remove('ativo');
+    document.getElementById('meuFormulario').reset();
+    document.querySelectorAll('.btn-pgto').forEach(b => b.classList.remove('ativo'));
+    formaPagamento = "";
+    Object.keys(produtos).forEach(id => produtos[id].qtd = 0);
+    renderizarCardapio();
+    atualizarCarrinho();
+  }
+
+  renderizarCardapio();
+</script>
+</body>
+</html>
